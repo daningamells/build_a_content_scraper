@@ -1,16 +1,15 @@
 const request = require("request");
 const cheerio = require('cheerio');
 const fs = require('fs');
+const Json2csvParser = require('json2csv').Parser;
 const data = './data';
 const url = "http://shirts4mike.com/";
-let UrlArray = [];
 const fields = ["Title", "Price", "ImageUrl", "Url", "Time"];
-var shirtsData = [];
-const Json2csvParser = require('json2csv').Parser;
-const opts = {
-  fields
-};
+const opts = {};
+let shirtsData = [];
+let UrlArray = [];
 
+// creating data folder if one doesn't exist
 if (!fs.existsSync(data)) {
   fs.mkdirSync(data);
 }
@@ -22,14 +21,15 @@ request(url + 'shirts.php', function(error, response, body) {
     displayError(error);
 
   } else {
-    var $ = cheerio.load(body);
+    const $ = cheerio.load(body);
     $("a[href*='id=']").each(function() {
       // Get the href of those links, and add that to the home page url
-      var link = $(this);
-      var href = link.attr("href");
-      var newUrl = url + "/" + href;
+      let link = $(this);
+      let href = link.attr("href");
+      let newUrl = url + "/" + href;
       UrlArray.push(newUrl);
-    })
+    });
+
     // second scrape to get product page infomation
     for (let i = 0; i < UrlArray.length; i++) {
       request(UrlArray[i], function(error, response, body) {
@@ -38,15 +38,16 @@ request(url + 'shirts.php', function(error, response, body) {
           displayError(error);
 
         } else {
-          var $ = cheerio.load(body);
-          var price = $(".price").text();
+          const $ = cheerio.load(body);
+          var price = $(".price").text(); //have to be var as let limits the scope
           var shirtUrl = response.request.uri.href;
           var title = $(".shirt-details h1").text().slice(4);
           var imageUrl = url + $('.shirt-picture img').attr('src');
           var time = new Date().toLocaleString();
         }
 
-        var shirtDetails = {
+        // object to hold shirt details
+        let shirtDetails = {
           Title: title,
           Price: price,
           ImageUrl: imageUrl,
@@ -60,57 +61,41 @@ request(url + 'shirts.php', function(error, response, body) {
             const parser = new Json2csvParser(opts);
             const csv = parser.parse(shirtsData);
 
-            /** Create csv file with today's file name */
+            // create csv file with today's file name
 
-            var today = new Date();
-            var dd = today.getDate();
-            var mm = today.getMonth() + 1; //January is 0!
-            var yyyy = today.getFullYear();
-
+            let today = new Date();
+            let dd = today.getDate();
+            let mm = today.getMonth() + 1; //jan is 0
+            let yyyy = today.getFullYear();
             if (dd < 10) {
-              dd = '0' + dd
+              dd = '0' + dd;
             }
-
             if (mm < 10) {
-              mm = '0' + mm
+              mm = '0' + mm;
             }
+            today = mm + '-' + dd + '-' + yyyy;
 
-            var today = mm + '-' + dd + '-' + yyyy;
-
-            data
-
-
-            /** If the data file for today already exists it should overwrite the file */
+            // ff the data file for today already exists it should overwrite the file
             fs.writeFile(data + "/" + today, csv, function(err) {
               if (err) throw err;
               console.log(today + ' created');
-            }); //End fo writeFile
-
-
-
-
+            }); //end of writeFile
           } catch (err) {
             console.error(err);
           }
         }
-
-
-
-
-      })
+      });
     }
-
   }
 });
 
-
-
+// error function passing in date and time
 function displayError(error) {
   console.log(error.message);
-  var errorTime = new Date().toLocaleString();
-  var errorLog = error.message + " " + errorTime + '\n';
+  let errorTime = new Date().toLocaleString();
+  let errorLog = error.message + " " + errorTime + '\n'; //puts errors on new line
 
-  // Writes to error log
+  // writes to error log
   fs.appendFile('scraper-error.log', errorLog, function(error) {
     if (error) throw error;
   });

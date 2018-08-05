@@ -73,12 +73,12 @@ request(url + 'shirts.php', function(error, response, body) {
             if (mm < 10) {
               mm = '0' + mm;
             }
-            today = mm + '-' + dd + '-' + yyyy;
+            today = yyyy + '-' + mm + '-' + dd;
 
             // ff the data file for today already exists it should overwrite the file
-            fs.writeFile(data + "/" + today, csv, function(err) {
+            fs.writeFile(data + "/" + today + ".csv", csv, function(err) {
               if (err) throw err;
-              console.log(today + ' created');
+              console.log(today + ".csv created");
             }); //end of writeFile
           } catch (err) {
             console.error(err);

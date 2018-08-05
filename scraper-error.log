@@ -26,3 +26,5 @@ Invalid URI "http/shirts4mike.com/shirts.php" 03/08/2018, 19:33:41
 Invalid URI "http/shirts4mike.com/shirts.php" 03/08/2018, 19:33:44
 getaddrinfo ENOTFOUND shirts4mike.com shirts4mike.com:80 03/08/2018, 19:38:23
 getaddrinfo ENOTFOUND shirts4mike.com shirts4mike.com:80 03/08/2018, 19:43:37
+getaddrinfo ENOTFOUND shirts4mike.com shirts4mike.com:80 04/08/2018, 20:48:25
+getaddrinfo ENOTFOUND shirts4mike.com shirts4mike.com:80 04/08/2018, 21:03:23
